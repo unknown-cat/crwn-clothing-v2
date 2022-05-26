@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import {
+  createAuthUserWithEmailAndPassword,
+  createUserDocumentFromAuth,
+} from '../../utils/firebase/firebase.utils';
 
 const defaultFormFields = {
   displayName: '',
@@ -6,10 +10,37 @@ const defaultFormFields = {
   password: '',
   cofirmPassword: '',
 };
+
 const SignUpForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { displayName, email, password, cofirmPassword } = formFields;
+
   console.log(formFields);
+
+  const resetFormField = () => {
+    setFormFields(defaultFormFields);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (password !== cofirmPassword)
+      return alert('your password does not match');
+
+    try {
+      const { user } = await createAuthUserWithEmailAndPassword(
+        email,
+        password
+      );
+
+      await createUserDocumentFromAuth(user, { displayName });
+      resetFormField();
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use')
+        return alert('Cannot create user, email already in use');
+      console.log('user creation encountered an error ', error.message);
+    }
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -19,7 +50,7 @@ const SignUpForm = () => {
   return (
     <section>
       <h2>Sign up with your email and password</h2>
-      <form onSubmit={() => {}}>
+      <form onSubmit={handleSubmit}>
         <label>Display Name</label>
         <input
           onChange={handleChange}
@@ -44,7 +75,12 @@ const SignUpForm = () => {
           type='password'
           name='password'
           value={password}
+          title='Enter an password consisting of 6-12 hexadecimal digits'
+          pattern='[0-9a-fA-F]{4,8}'
+          minLength='6'
+          maxLength='12'
           required
+          autoComplete='off'
         />
 
         <label>Confirm Password</label>
