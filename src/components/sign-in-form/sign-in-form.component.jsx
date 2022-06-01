@@ -39,7 +39,18 @@ const SignInForm = () => {
       );
       console.log(response);
       resetFormField();
-    } catch (error) {}
+    } catch (error) {
+      switch (error.code) {
+        case 'auth/wrong-password':
+          alert('incorrect password');
+          break;
+        case 'auth/user-not-found':
+          alert('no such user');
+          break;
+        default:
+          console.log(error);
+      }
+    }
   };
 
   const handleChange = (event) => {
@@ -67,17 +78,17 @@ const SignInForm = () => {
           type='password'
           name='password'
           value={password}
-          title='Enter an password consisting of 6-12 hexadecimal digits'
+          title='Enter an password consisting of 6-20 hexadecimal digits'
           pattern='[0-9a-fA-F]{4,8}'
           minLength='6'
-          maxLength='12'
+          maxLength='20'
           required
           autoComplete='off'
         />
 
         <div className='buttons-container'>
           <Button type='submit'>Sign In</Button>
-          <Button onClick={signInWithGoogle} buttonType='google'>
+          <Button onClick={signInWithGoogle} buttonType='google' type='button'>
             Google Sign In
           </Button>
         </div>
