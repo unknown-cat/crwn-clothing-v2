@@ -99,7 +99,7 @@ const SignUpForm = () => {
           required
         />
 
-        <Button type='section'>Sign Up</Button>
+        <Button type='submit'>Sign Up</Button>
       </form>
     </section>
   );
